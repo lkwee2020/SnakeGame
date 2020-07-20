@@ -15,6 +15,7 @@ class Snake(tk.Canvas):
         self.load_assets()
         self.play_button_screen()
         self.high_score = 0
+        self.scores = []
 
     #loades images of the snake and the food
     def load_assets(self):
@@ -29,16 +30,18 @@ class Snake(tk.Canvas):
             root.destroy()
 
     def play_button_screen(self):
-        play_button = tk.Button(
+        self.play_button = tk.Button(
             text="Press to play",
             fg="green",
             command=lambda: self.play()
         )
-        play_button.pack(side='bottom')
+        self.play_button.pack(side='bottom')
+
 
 
     def play(self):
         self.delete(tk.ALL)
+        self.play_button.destroy()
         self.snake_positions = [(100,100), (80, 100), (60, 100)]
         self.food_position = self.set_new_food_position()
         self.score = 0
@@ -151,6 +154,51 @@ class Snake(tk.Canvas):
             fill="#fff",
             font=("TkDefaultFont", 24)
         )
+        self.enter_name = tk.Button(
+            text="Press to enter name",
+            fg="red",
+            command=lambda: self.enter_high_score()
+        )
+        self.enter_name.pack(side='bottom')
+
+    def enter_high_score(self):
+        self.enter_name.destroy()
+        #self.tk.Label(text=f"Enter name:")
+        self.enter_button = tk.Button(
+            text="Enter",
+            fg="red",
+            command=lambda: self.save_scores()
+        )
+        self.name = tk.Entry()
+        self.name.pack()
+        self.enter_button.pack()
+    
+    def save_scores(self):
+        self.enter_button.destroy()
+        self.scores.append((self.name.get(), self.score))
+        self.name.destroy()
+        self.high_score_button = tk.Button(
+            text="Press to see your high scores",
+            fg="blue",
+            command=lambda: self.show_high_scores()
+        )
+
+        self.high_score_button.pack(side='bottom')
+
+
+    def show_high_scores(self):
+        self.delete(tk.ALL)
+        self.create_text(
+            self.winfo_width() / 2,
+            self.winfo_height() / 2,
+            text=f"High scores: {self.scores}",
+            fill="#fff",
+            font=("TkDefaultFont", 24)
+        )
+        self.high_score_button.destroy()
+        self.after(GAME_SPEED, self.play_button_screen)
+
+
 
 
 # creates a main window for the application
@@ -158,8 +206,8 @@ root = tk.Tk()
 root.title('Snake')
 root.resizable(False, False)
 
-board = Snake()
-board.pack()
+game = Snake()
+game.pack()
 
 # runs main app
 root.mainloop()
