@@ -25,11 +25,24 @@ class Snake(tk.Canvas):
 
             self.food_image = Image.open("./assets/food.png")
             self.food = ImageTk.PhotoImage(self.food_image)
+
+            self.snake_logo_image = Image.open('./assets/logo.png')
+            self.snake_logo = ImageTk.PhotoImage(self.snake_logo_image)
+
+            self.snake_logo2_image = Image.open('./assets/logo2.png')
+            self.snake_logo2_image = self.snake_logo2_image.resize((400,70), Image.ANTIALIAS)
+            self.snake_logo2 = ImageTk.PhotoImage(self.snake_logo2_image)
         except IOError as error:
             print('error')
             root.destroy()
 
     def play_button_screen(self):
+        self.logo = self.create_image(335, 195,
+            image=self.snake_logo, tag='logo'
+        )
+        self.logo2 = self.create_image(320, 300,
+            image=self.snake_logo2, tag = 'logo'
+        )
         self.play_button = tk.Button(
             text="Press to play",
             fg="green",
@@ -150,19 +163,35 @@ class Snake(tk.Canvas):
         self.create_text(
             self.winfo_width() / 2,
             self.winfo_height() / 2,
-            text=f"Game over! You scored {self.score}!\nYour high score is {self.high_score}!", 
+            text=f"Game over! You scored {self.score}!\nThe high score is {self.high_score}!", 
             fill="#fff",
             font=("TkDefaultFont", 24)
         )
         self.enter_name = tk.Button(
-            text="Press to enter name",
+            text="Enter name",
             fg="red",
             command=lambda: self.enter_high_score()
         )
         self.enter_name.pack(side='bottom')
+        
+        self.play_again = tk.Button(
+            text="Play again",
+            fg="green",
+            command=lambda: self.play_game_again()
+        )
+        self.play_again.pack(side='bottom')
+
+    def play_game_again(self):
+        self.enter_name.destroy()
+        self.play_again.destroy()
+        self.scores.append(("BLANK", self.score))
+        self.play()
+
 
     def enter_high_score(self):
         self.enter_name.destroy()
+        self.play_again.destroy()
+        self.play_button.destroy()
         #self.tk.Label(text=f"Enter name:")
         self.enter_button = tk.Button(
             text="Enter",
@@ -188,13 +217,24 @@ class Snake(tk.Canvas):
 
     def show_high_scores(self):
         self.delete(tk.ALL)
+
         self.create_text(
             self.winfo_width() / 2,
-            self.winfo_height() / 2,
-            text=f"High scores: {self.scores}",
-            fill="#fff",
+            self.winfo_height() / 2 + 80,
+            text=f"High scores:",
+            fill="#FF0000",
             font=("TkDefaultFont", 24)
         )
+        i = 0
+        for name in self.scores:
+            i += 30
+            self.create_text(
+                self.winfo_width() / 2,
+                self.winfo_height() / 2 + 80 + i,
+                text=f"{name[0]}: {name[1]}",
+                fill="#fff",
+                font=("TkDefaultFont", 24)
+            )
         self.high_score_button.destroy()
         self.after(GAME_SPEED, self.play_button_screen)
 
